@@ -1,21 +1,61 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h1>Login</h1>
-<% if (err) { %>
-<p style="color:red;">Invalid email or password</p>
-<% } %>
-<form method="POST" action="/login">
-<input name="email" placeholder="email" />
-<input name="password" type="password" placeholder="password" />
-<button type="submit">Login</button>
-</form>
-<hr />
-<p>Need a test user?</p>
-<form method="POST" action="/register">
-<input name="email" placeholder="email" />
-<input name="password" type="password" placeholder="password" />
-<button type="submit">Register (for testing)</button>
-</form>
+    <h1>Login</h1>
+
+    <% if (typeof query !== 'undefined' && query.left && query.err === 'invalid') { %>
+        <p style="color: orange; font-weight: bold;">
+            Invalid email or password. You have 
+            <%= query.left === 'last' ? 'last' : query.left %> 
+            attempts left.
+        </p>
+    <% } %>
+
+    <% if (typeof query !== 'undefined' && query.err === 'locked') { %>
+        <div id="timer-container" style="color: red; border: 2px solid red; padding: 10px; margin-bottom: 10px;">
+            Too many attempts! Please wait <span id="timer">--:--</span> before trying again.
+        </div>
+        
+        <script>
+            let totalSeconds = parseInt("<%= query.wait %>");
+            const display = document.getElementById('timer');
+
+            function updateTimerDisplay(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                // Format as MM:SS with leading zeros
+                display.innerText = `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            updateTimerDisplay(totalSeconds);
+
+            const interval = setInterval(() => {
+                totalSeconds--;
+                if (totalSeconds <= 0) {
+                    clearInterval(interval);
+                    document.getElementById('timer-container').innerHTML = 
+                        "<span style='color:green'>You can try again now. Please refresh the page.</span>";
+                } else {
+                    updateTimerDisplay(totalSeconds);
+                }
+            }, 1000);
+        </script>
+    <% } %>
+
+    <form method="POST" action="/login">
+        <input name="email" type="email" placeholder="email" required />
+        <input name="password" type="password" placeholder="password" required />
+        <button type="submit">Login</button>
+    </form>
+
+    <hr />
+    <p>Need a test user?</p>
+    <form method="POST" action="/register">
+        <input name="email" placeholder="email" required />
+        <input name="password" type="password" placeholder="password" required />
+        <button type="submit">Register (for testing)</button>
+    </form>
+
+    <p><a href="/">Back to Home</a></p>
 </body>
 </html>

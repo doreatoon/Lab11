@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 <html>
+<head><title>Home</title></head>
 <body>
-    <h1>Home</h1>
-    <p><a href="/login">Login</a></p>
-    <p><a href="/profile">Profile (protected)</a></p>
+    <h1>Home Page</h1>
+    <nav>
+        <% if (user) { %>
+            <p>Logged in as: <strong><%= user.email %></strong></p>
+            <p><a href="/profile">Go to Profile</a></p>
+            <form method="POST" action="/logout">
+                <button type="submit">Logout</button>
+            </form>
+        <% } else { %>
+            <p><a href="/login">Login / Register</a></p>
+        <% } %>
+    </nav>
 </body>
 </html>
